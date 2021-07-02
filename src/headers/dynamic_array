@@ -1,0 +1,211 @@
+// Copyright 2021 Yash Pandey(YP) - EmperorYP7
+
+#include <functional>
+
+namespace custom {
+
+template<typename VectorType>
+class vector_iterator {
+public:
+    using ValueType = typename VectorType::ValueType;
+    using PointerValue = ValueType*;
+    using ReferenceValue = ValueType &;
+private:
+    PointerValue m_ptr;
+
+public:
+    vector_iterator(PointerValue ptr)
+        : m_ptr(ptr)
+    {}
+
+    vector_iterator operator++()
+    {
+        m_ptr++;
+        return *this;
+    }
+
+    vector_iterator operator++(int)
+    {
+        vector_iterator temporary = *this;
+        ++(*this);
+        return temporary;
+    }
+    vector_iterator operator--()
+    {
+        m_ptr--;
+        return *this;
+    }
+
+    vector_iterator operator--(int)
+    {
+        vector_iterator temporary = *this;
+        --(*this);
+        return temporary;
+    }
+
+    ReferenceValue operator[](int index)
+    {
+        return *(m_ptr + index);
+    }
+
+    PointerValue operator->()
+    {
+        return m_ptr;
+    }
+
+    ReferenceValue operator*()
+    {
+        return *m_ptr;
+    }
+
+    bool operator==(const vector_iterator& other) const
+    {
+        return m_ptr == other.m_ptr;
+    }
+
+    bool operator!=(const vector_iterator& other) const
+    {
+        return m_ptr != other.m_ptr;
+    }
+};
+
+template<typename ElementType, typename Allocator = std::allocator<ElementType>>
+class dynamic_array {
+public:
+    using ValueType = ElementType;
+    using iterator = vector_iterator<dynamic_array<ElementType, Allocator>>;
+private:
+    typedef ElementType *data_ptr;
+private:
+    data_ptr m_data = nullptr;
+    Allocator m_allocator;
+    size_t m_size = 0;
+    size_t m_capacity = 0;
+private:
+    void reallocate(size_t p_new_size)
+    {
+        data_ptr new_data = m_allocator.allocate(p_new_size);
+        size_t size = (m_size > p_new_size) ? p_new_size : m_size;
+        for (size_t i = 0; i < size; ++i)
+            new_data[i] = m_data[i];
+        delete[] m_data;
+        m_data = new_data;
+        m_capacity = p_new_size;
+    }
+public:
+    dynamic_array()
+    {
+        reallocate(2);
+    }
+
+    dynamic_array(dynamic_array& p_copy)
+        : m_size(p_copy->m_size)
+    {
+        reallocate(m_size);
+        for (size_t i = 0; i < m_size; ++i)
+            m_data[i] = p_copy->m_data[i];
+    }
+
+    dynamic_array(dynamic_array&& p_rvalue)
+        : m_capacity(p_rvalue->m_capacity), m_data(p_rvalue->m_data), m_size(p_rvalue->m_size)
+    {
+        p_rvalue = nullptr;
+    }
+
+    dynamic_array(const size_t p_size)
+    {
+        reallocate(p_size);
+    }
+
+    dynamic_array(const size_t p_size, const ElementType& p_value)
+    {
+        reallocate(p_size);
+        for (size_t i = 0; i < p_size; ++i)
+            m_data[i] = p_value;
+        m_size = p_size;
+    }
+
+    dynamic_array(const std::initializer_list<ElementType>& p_list)
+    {
+        size_t size = p_list.size();
+        reallocate(size);
+        auto it = p_list.begin();
+        for (size_t i = 0; i < size && it != p_list.end(); ++i, ++it)
+            m_data[i] = *it;
+        m_size = p_list.size();
+    }
+
+    ~dynamic_array()
+    {
+        m_allocator.deallocate(m_data, m_capacity);
+    }
+
+    ElementType& operator[] (size_t p_index)
+    {
+        if(p_index > m_size)
+        {
+            
+        }
+        return m_data[p_index];
+    }
+
+    const ElementType& operator[] (size_t p_index) const
+    {
+        if(p_index > m_size)
+        {
+            
+        }
+        return m_data[p_index];
+    }
+
+    ElementType& push_back(const ElementType& p_element)
+    {
+        if(m_size >= m_capacity)
+            reallocate(m_capacity << 1);
+        m_data[m_size] = p_element;
+        return m_data[m_size++];
+    }
+
+    ElementType& push_back(ElementType&& p_element)
+    {
+        return this->emplace_back(std::move(p_element));
+    }
+
+    void pop_back() noexcept
+    {
+        if(m_size > 0)
+            --m_size;
+    }
+
+    template<typename... Args>
+    ElementType& emplace_back(Args&&... args)
+    {
+        if(m_size >= m_capacity)
+            reallocate(m_capacity << 1);
+        new(&m_data[m_size]) ElementType(std::forward<Args>(args)...);
+        return m_data[m_size++];
+    }
+
+    constexpr size_t size()
+    {
+        return m_size;
+    }
+
+    void clear()
+    {
+        for (size_t i = 0; i < m_size; ++i)
+            m_data[i].~ElementType();
+        m_size = 0;
+    }
+
+    iterator begin()
+    {
+        return iterator(m_data);
+    }
+
+    iterator end()
+    {
+        return iterator(m_data + m_size);
+    }
+};
+}
