@@ -1,5 +1,0 @@
-/Users/emperoryp/Documents/Institute/datastructure/build/CMakeFiles/rebuild_cache.dir
-/Users/emperoryp/Documents/Institute/datastructure/build/CMakeFiles/edit_cache.dir
-/Users/emperoryp/Documents/Institute/datastructure/build/src/CMakeFiles/rebuild_cache.dir
-/Users/emperoryp/Documents/Institute/datastructure/build/src/CMakeFiles/edit_cache.dir
-/Users/emperoryp/Documents/Institute/datastructure/build/src/CMakeFiles/test.dir
