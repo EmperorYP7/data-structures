@@ -1,6 +1,11 @@
 # Copyright 2021 Yash Pandey(YP) - EmperorYP7
-add_executable(test
+add_executable(testarray
     test.cpp
 )
 
-target_include_directories(test PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/headers)
+add_executable(testmap
+    test_map.cpp
+)
+
+target_include_directories(testarray PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/headers)
+target_include_directories(testmap PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/headers)
