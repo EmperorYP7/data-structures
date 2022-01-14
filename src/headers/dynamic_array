@@ -14,7 +14,7 @@ private:
     PointerValue m_ptr;
 
 public:
-    vector_iterator(PointerValue ptr)
+    explicit vector_iterator(PointerValue ptr)
         : m_ptr(ptr)
     {}
 
@@ -107,12 +107,12 @@ public:
     }
 
     dynamic_array(dynamic_array&& p_rvalue)
-        : m_capacity(p_rvalue->m_capacity), m_data(p_rvalue->m_data), m_size(p_rvalue->m_size)
+ noexcept         : m_capacity(p_rvalue->m_capacity), m_data(p_rvalue->m_data), m_size(p_rvalue->m_size)
     {
         p_rvalue = nullptr;
     }
 
-    dynamic_array(const size_t p_size)
+    explicit dynamic_array(const size_t p_size)
     {
         reallocate(p_size);
     }
@@ -142,18 +142,18 @@ public:
 
     ElementType& operator[] (size_t p_index)
     {
-        if(p_index > m_size)
+        if(p_index >= m_size)
         {
-            
+            throw std::out_of_range("[dynamic_array]: The program tried to access an element which was out of bounds");
         }
         return m_data[p_index];
     }
 
     const ElementType& operator[] (size_t p_index) const
     {
-        if(p_index > m_size)
+        if(p_index >= m_size)
         {
-            
+            throw std::out_of_range("[dynamic_array]: The program tried to access an element which was out of bounds");
         }
         return m_data[p_index];
     }
