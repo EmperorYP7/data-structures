@@ -100,7 +100,7 @@ private:
 
         clear();
 
-        ::operator delete[](m_data);
+        traits_t::deallocate(m_allocator, m_data, m_capacity);
 
         m_data = new_data;
         m_capacity = p_new_size;
@@ -152,7 +152,7 @@ public:
     {
         clear();
 
-        ::operator delete[](m_data);
+        ::operator delete[](m_data, m_capacity);
     }
 
     ElementType& operator[] (size_t p_index)
@@ -186,7 +186,7 @@ public:
         return this->emplace_back(std::move(p_element));
     }
 
-    void pop_back() noexcept
+    [[maybe_unused]] void pop_back() noexcept
     {
         if(m_size > 0)
             --m_size;
@@ -209,7 +209,7 @@ public:
     void clear()
     {
         for(size_t i = 0; i < m_size; ++i)
-            m_data[i].~ElementType();
+            traits_t::destroy(m_allocator, m_data + i);
         m_size = 0;
     }
 

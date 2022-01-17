@@ -15,14 +15,14 @@ void* operator new(size_t size) {
 }
 
 void operator delete(void* ptr, size_t size) noexcept {
-    std::cout << "\t[delete]: Freeing " << size << " bytes\n";
+    std::cout << "\t[delete]: Freeing " << size <<" bytes\n";
     total_memory_used -= size;
     free(ptr);
 }
 
 void operator delete[](void* ptr, size_t size) noexcept {
-    std::cout << "\t[delete]: Freeing " << size << " bytes\n";
-    total_memory_used -= size;
+    std::cout << "\t[delete]: Freeing " << size * 24 << " bytes\n";
+    total_memory_used -= size * 24;
     free(ptr);
 }
 #endif
