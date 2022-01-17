@@ -5,7 +5,7 @@ add_executable(testarray
 
 add_executable(testmap
     test_map.cpp
-)
+        headers/hashmap)
 
 target_include_directories(testarray PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/headers)
 target_include_directories(testmap PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/headers)

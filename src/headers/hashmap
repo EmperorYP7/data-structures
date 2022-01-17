@@ -1,0 +1,104 @@
+// Copyright 2021 Yash Pandey(YP) - EmperorYP7
+
+#ifndef DATASTRUCTURES_HASHMAP_
+#define DATASTRUCTURES_HASHMAP_
+
+#include <functional>
+#include <utility>
+#include <initializer_list>
+#include <forward_list>
+
+namespace custom {
+    template<typename KeyType, typename ValueType,
+            typename HashFn = std::hash<KeyType>,
+            typename PredFn = std::equal_to<KeyType>,
+            typename Allocator = std::allocator<std::pair<const KeyType, ValueType>>>
+            class hashbucket {
+            private:
+                using NodeType = std::pair<const KeyType, ValueType>;
+                using NodeList = std::forward_list<NodeType>;
+            private:
+                NodeList m_data;
+                size_t m_size;
+                size_t m_capacity;
+            public:
+                explicit hashbucket(size_t capacity)
+                    : m_capacity(capacity), m_size(0)
+                {
+                    m_data.resize(m_capacity);
+                }
+
+                void insert(const KeyType& key, const ValueType& value) {
+                    m_data[m_size] =
+                }
+            };
+
+
+    template<typename KeyType, typename ValueType,
+            typename HashFn = std::hash<KeyType>,
+            typename PredFn = std::equal_to<KeyType>,
+            typename Allocator = std::allocator<std::pair<const KeyType, ValueType>>>
+            class hashtable {
+            private:
+                using NodeType = std::pair<const KeyType, ValueType>;
+                using BucketType = hashbucket<KeyType, ValueType, PredFn, Allocator>;
+                using BucketPtr = BucketType*;
+
+                size_t m_bucket_count = 1;
+                size_t m_element_count = 0;
+                float m_max_load_factor = 1.0f;
+
+                void rehash(size_t new_size) {
+                    if(m_bucket_count >= new_size)
+                        return;
+
+                    m_bucket_count = new_size;
+
+                }
+
+            public:
+                explicit hashtable(size_t bsize)
+                    : m_bucket_count(bsize)
+                {
+                }
+
+            };
+
+    template<typename KeyType, typename ValueType,
+            typename HashFn = std::hash<KeyType>,
+            typename PredFn = std::equal_to<KeyType>,
+            typename Allocator = std::allocator<std::pair<const KeyType, ValueType>>>
+            class hashmap {
+            private:
+                typedef hashtable<KeyType, ValueType, HashFn, PredFn, Allocator> HashTableType;
+                HashTableType m_hashTable;
+
+            public:
+                hashmap()
+                    : m_hashTable(1)
+                {
+                }
+
+                explicit hashmap(size_t bucket_count)
+                    : m_hashTable(bucket_count)
+                {}
+
+                hashmap(hashmap& other)
+                    : m_hashTable(other.m_hashTable)
+                {
+                }
+
+                hashmap(hashmap&& other)
+ noexcept                     : m_hashTable(std::move(other))
+                {
+                }
+
+                hashmap(const std::initializer_list<std::pair<KeyType, ValueType>>& list) {
+                    m_hashTable.reserve(list.size());
+                    for(auto [first, second] : list)
+                        m_hashTable.insert(first, second);
+                }
+            };
+}
+
+#endif //DATASTRUCTURES_HASHMAP_

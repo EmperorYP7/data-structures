@@ -1,6 +1,12 @@
 // Copyright 2021 Yash Pandey(YP) - EmperorYP7
 
+#ifndef DATASTRUCTURES_DYNAMIC_ARRAY_
+#define DATASTRUCTURES_DYNAMIC_ARRAY_
+
 #include <functional>
+#include <algorithm>
+#include <memory>
+#include <execution>
 
 namespace custom {
 
@@ -77,18 +83,25 @@ public:
 private:
     typedef ElementType *data_ptr;
 private:
-    data_ptr m_data = nullptr;
     Allocator m_allocator;
+    using traits_t = std::allocator_traits<decltype(m_allocator)>;
+
+    data_ptr m_data = nullptr;
     size_t m_size = 0;
     size_t m_capacity = 0;
 private:
     void reallocate(size_t p_new_size)
     {
-        data_ptr new_data = m_allocator.allocate(p_new_size);
-        size_t size = (m_size > p_new_size) ? p_new_size : m_size;
+        data_ptr new_data = traits_t::allocate(m_allocator, p_new_size);
+        size_t size = std::min(p_new_size, m_size);
+
         for (size_t i = 0; i < size; ++i)
-            new_data[i] = m_data[i];
-        delete[] m_data;
+            traits_t::construct(m_allocator, new_data + i, m_data[i]);
+
+        clear();
+
+        ::operator delete[](m_data);
+
         m_data = new_data;
         m_capacity = p_new_size;
     }
@@ -137,7 +150,9 @@ public:
 
     ~dynamic_array()
     {
-        m_allocator.deallocate(m_data, m_capacity);
+        clear();
+
+        ::operator delete[](m_data);
     }
 
     ElementType& operator[] (size_t p_index)
@@ -193,7 +208,7 @@ public:
 
     void clear()
     {
-        for (size_t i = 0; i < m_size; ++i)
+        for(size_t i = 0; i < m_size; ++i)
             m_data[i].~ElementType();
         m_size = 0;
     }
@@ -209,3 +224,5 @@ public:
     }
 };
 }
+
+#endif //DATASTRUCTURES_DYNAMIC_ARRAY_
